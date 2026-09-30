@@ -1,0 +1,1630 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LedgerVision · Your business, in focus</title>
+    <style>
+      :root {
+        --ink: #172d2c;
+        --muted: #74817d;
+        --green: #216652;
+        --lime: #dcf1a7;
+        --bg: #f5f6f2;
+        --line: #e4e9e2;
+        --red: #b95343;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px "Segoe UI",
+          system-ui,
+          sans-serif;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button,
+      a,
+      input,
+      select {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 3px solid #82bca5;
+        outline-offset: 3px;
+      }
+      button {
+        border: 0;
+        background: none;
+        color: inherit;
+      }
+      button:hover {
+        filter: brightness(0.96);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 232px 1fr;
+        min-height: 100vh;
+      }
+      .sidebar {
+        background: #fff;
+        border-right: 1px solid var(--line);
+        padding: 32px 22px;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 232px;
+        display: flex;
+        flex-direction: column;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 21px;
+        font-weight: 750;
+        letter-spacing: -0.8px;
+      }
+      .logo {
+        background: var(--green);
+        color: var(--lime);
+        border-radius: 12px;
+        padding: 7px 10px;
+        font-size: 24px;
+      }
+      .brand small {
+        font-size: 10px;
+        letter-spacing: 2px;
+        display: block;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .workspace {
+        margin: 35px 0 26px;
+        padding: 14px 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .workspace b {
+        display: block;
+        font-size: 13px;
+      }
+      .muted,
+      small {
+        color: var(--muted);
+      }
+      .nav {
+        display: grid;
+        gap: 7px;
+      }
+      .nav button {
+        text-align: left;
+        padding: 13px;
+        border-radius: 9px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        color: #687570;
+        font-weight: 600;
+      }
+      .nav button.active {
+        background: #eaf2e9;
+        color: var(--green);
+      }
+      .nav svg {
+        width: 19px;
+        height: 19px;
+      }
+      .sidebar-bottom {
+        margin-top: auto;
+        padding-top: 25px;
+      }
+      .demo-note {
+        padding: 15px;
+        background: #f4f7ed;
+        border-radius: 12px;
+        font-size: 12px;
+        line-height: 1.7;
+        margin-bottom: 20px;
+      }
+      .role {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        color: var(--ink);
+      }
+      main {
+        grid-column: 2;
+        min-width: 0;
+      }
+      .topbar {
+        height: 83px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        background: #ffffff99;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .badge {
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        background: #eaf1df;
+        color: var(--green);
+        padding: 6px 10px;
+        border-radius: 20px;
+      }
+      .avatar {
+        border-radius: 50%;
+        background: #e5eadc;
+        padding: 11px;
+        font-weight: 650;
+      }
+      .content {
+        max-width: 1400px;
+        margin: auto;
+        padding: 32px 40px 40px;
+      }
+      .heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 27px;
+      }
+      h1 {
+        font-size: 30px;
+        letter-spacing: -1px;
+        margin: 0 0 7px;
+        font-weight: 650;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 650;
+      }
+      p {
+        line-height: 1.65;
+      }
+      .heading p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 9px;
+        padding: 11px 16px;
+        background: white;
+        border: 1px solid var(--line);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .btn.primary {
+        background: var(--green);
+        border-color: var(--green);
+        color: white;
+      }
+      .btn svg {
+        width: 17px;
+        height: 17px;
+      }
+      .filters {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+      }
+      .filters select,
+      .filters input {
+        padding: 10px 13px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+      }
+      .filters .period {
+        margin-left: auto;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .stat {
+        background: white;
+        border: 1px solid var(--line);
+        padding: 22px;
+        border-radius: 13px;
+      }
+      .stat.featured {
+        background: var(--green);
+        color: #fff;
+        border-color: var(--green);
+      }
+      .stat .label {
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--muted);
+      }
+      .stat.featured .label,
+      .stat.featured small {
+        color: #cfdfd4;
+      }
+      .stat .value {
+        font-size: 29px;
+        letter-spacing: -1px;
+        font-weight: 650;
+        margin: 15px 0 9px;
+      }
+      .stat small {
+        font-size: 11px;
+      }
+      .stat svg {
+        width: 18px;
+        height: 18px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr);
+        gap: 22px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 23px;
+        min-width: 0;
+      }
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .link {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 650;
+        padding: 5px;
+      }
+      .legend {
+        display: flex;
+        gap: 16px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        background: var(--green);
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .dot.expense {
+        background: #bed2a1;
+      }
+      .chart {
+        height: 213px;
+        display: flex;
+        gap: 16px;
+        padding-top: 10px;
+      }
+      .axis {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-bottom: 25px;
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .bars {
+        flex: 1;
+        display: flex;
+        justify-content: space-around;
+        border-bottom: 1px solid var(--line);
+        background: repeating-linear-gradient(
+          to top,
+          transparent 0,
+          transparent 44px,
+          #eef1ec 45px,
+          #eef1ec 46px
+        );
+        gap: 10px;
+      }
+      .bar-group {
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 5px;
+        position: relative;
+        padding-bottom: 25px;
+        max-width: 64px;
+      }
+      .bar {
+        width: 22px;
+        border-radius: 5px 5px 0 0;
+        background: var(--green);
+        min-height: 2px;
+      }
+      .bar.expense {
+        background: #bed2a1;
+      }
+      .bar-group small {
+        position: absolute;
+        bottom: 4px;
+        font-size: 10px;
+      }
+      .insight {
+        background: #f3f6eb;
+        border: 1px solid #e6edda;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 12px;
+      }
+      .insight p {
+        font-size: 12px;
+        margin: 7px 0;
+        color: #607067;
+      }
+      .insight b {
+        font-size: 13px;
+      }
+      .insight-label {
+        color: var(--green);
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid #edf0eb;
+      }
+      .row:last-child {
+        border: 0;
+      }
+      .row .grow {
+        flex: 1;
+        min-width: 0;
+      }
+      .row b {
+        font-size: 13px;
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .row small {
+        display: block;
+        font-size: 11px;
+        margin-top: 5px;
+      }
+      .row-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #f0f3eb;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .row-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .positive {
+        color: var(--green);
+      }
+      .negative {
+        color: var(--red);
+      }
+      .amount {
+        font-weight: 650;
+        white-space: nowrap;
+      }
+      .full {
+        grid-column: 1/-1;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        margin-top: 22px;
+      }
+      .branch-row {
+        width: 100%;
+        text-align: left;
+      }
+      .progress {
+        height: 5px;
+        border-radius: 8px;
+        background: #edf1e8;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      .progress span {
+        display: block;
+        height: 100%;
+        background: #8aab72;
+        border-radius: 8px;
+      }
+      .footer {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .empty {
+        text-align: center;
+        padding: 45px 20px;
+        color: var(--muted);
+      }
+      .transaction-row {
+        width: 100%;
+        text-align: left;
+      }
+      .transaction-row:hover {
+        background: #fafbf8;
+      }
+      .chat {
+        max-width: 800px;
+        margin: auto;
+      }
+      .bubble {
+        padding: 18px 21px;
+        border-radius: 14px;
+        background: white;
+        border: 1px solid var(--line);
+        margin: 14px 0;
+        line-height: 1.75;
+        white-space: pre-wrap;
+      }
+      .bubble.user {
+        background: #e9f0df;
+        margin-left: 50px;
+      }
+      .chat-form {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      .chat-form input {
+        flex: 1;
+        min-width: 0;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+      }
+      .suggestions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .suggestions button {
+        font-size: 12px;
+      }
+      .capture-panel {
+        max-width: 720px;
+        margin: auto;
+      }
+      .drop {
+        border: 2px dashed #cdd9c3;
+        background: #f8faf4;
+        padding: 38px 20px;
+        text-align: center;
+        border-radius: 12px;
+      }
+      .drop svg {
+        width: 35px;
+        height: 35px;
+        color: var(--green);
+      }
+      .drop input {
+        max-width: 100%;
+        margin-top: 15px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 17px;
+      }
+      .field {
+        display: grid;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        border: 1px solid #dce3d8;
+        border-radius: 8px;
+        padding: 12px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .field.full {
+        grid-column: 1/-1;
+      }
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 27px;
+        width: 520px;
+        max-width: calc(100% - 28px);
+        max-height: 90vh;
+        overflow: auto;
+        color: var(--ink);
+        box-shadow: 0 25px 100px #162c2930;
+      }
+      dialog::backdrop {
+        background: #14292366;
+        backdrop-filter: blur(4px);
+      }
+      .dialog-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 23px;
+      }
+      .close {
+        font-size: 24px;
+        padding: 3px 8px;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--ink);
+        color: white;
+        padding: 13px 22px;
+        border-radius: 10px;
+        z-index: 10;
+        box-shadow: 0 5px 25px #0002;
+        max-width: 90%;
+        font-size: 13px;
+      }
+      .toast:empty {
+        display: none;
+      }
+      .mobile-nav {
+        display: none;
+      }
+      .receipt-preview {
+        max-height: 160px;
+        max-width: 100%;
+        display: block;
+        margin: 15px auto;
+      }
+      .health {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .ring {
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: conic-gradient(var(--green) var(--score), #e9eee1 0);
+      }
+      .ring span {
+        background: white;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        font-weight: 650;
+      }
+      .hide {
+        display: none !important;
+      }
+      @media (min-width: 1500px) {
+        .content {
+          padding-top: 40px;
+        }
+      }
+      @media (max-width: 1100px) {
+        .sidebar {
+          width: 195px;
+          padding: 25px 15px;
+        }
+        .layout {
+          grid-template-columns: 195px 1fr;
+        }
+        .content {
+          padding: 25px;
+        }
+        .topbar {
+          padding: 0 25px;
+        }
+        .stats {
+          gap: 10px;
+        }
+        .stat {
+          padding: 17px;
+        }
+        .stat .value {
+          font-size: 24px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .two {
+          grid-template-columns: 1fr 1fr;
+        }
+        .grid > .card:last-child {
+          display: block;
+        }
+      }
+      @media (max-width: 700px) {
+        .layout {
+          display: block;
+        }
+        .sidebar {
+          display: none;
+        }
+        .topbar {
+          height: 68px;
+          padding: 0 20px;
+        }
+        .topbar-right {
+          gap: 10px;
+        }
+        .topbar .muted {
+          font-size: 12px;
+        }
+        .content {
+          padding: 25px 18px 100px;
+        }
+        .heading {
+          align-items: flex-start;
+        }
+        .heading h1 {
+          font-size: 25px;
+        }
+        .heading p {
+          font-size: 12px;
+          max-width: 230px;
+        }
+        .heading > .btn {
+          padding: 10px;
+          font-size: 12px;
+        }
+        .stats {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-bottom: 17px;
+        }
+        .stat {
+          padding: 16px;
+        }
+        .stat .value {
+          font-size: 25px;
+        }
+        .stat small {
+          font-size: 10px;
+        }
+        .grid,
+        .two {
+          grid-template-columns: 1fr;
+          gap: 17px;
+        }
+        .two {
+          margin-top: 17px;
+        }
+        .card {
+          padding: 19px;
+        }
+        .filters select {
+          max-width: 48%;
+          font-size: 12px;
+        }
+        .filters .period {
+          margin-left: 0;
+        }
+        .mobile-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: #fffffff5;
+          backdrop-filter: blur(12px);
+          border-top: 1px solid var(--line);
+          z-index: 4;
+          justify-content: space-around;
+          padding: 9px 3px max(9px, env(safe-area-inset-bottom));
+        }
+        .mobile-nav button {
+          font-size: 10px;
+          display: grid;
+          justify-items: center;
+          gap: 5px;
+          color: var(--muted);
+          min-width: 55px;
+          padding: 5px;
+        }
+        .mobile-nav button.active {
+          color: var(--green);
+          font-weight: 700;
+        }
+        .mobile-nav svg {
+          width: 21px;
+          height: 21px;
+        }
+        .toast {
+          bottom: 85px;
+        }
+        .footer {
+          font-size: 10px;
+        }
+        .form-grid {
+          gap: 13px;
+        }
+        .legend {
+          gap: 9px;
+        }
+        .badge {
+          font-size: 9px;
+        }
+        .chat-form .btn {
+          padding: 12px;
+        }
+        .branch-row .amount {
+          font-size: 12px;
+        }
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .content {
+          animation: appear 0.25s ease;
+        }
+        @keyframes appear {
+          from {
+            opacity: 0.6;
+            transform: translateY(4px);
+          }
+          to {
+            opacity: 1;
+            transform: none;
+          }
+        }
+      }
+
+      /* Keep the app sized to its simulated mobile viewport. */
+      html,
+      body {
+        height: 100%;
+        scrollbar-width: thin;
+        scrollbar-color: #c8d2c0 transparent;
+      }
+      @media (max-width: 700px) {
+        .topbar {
+          position: sticky;
+          top: 0;
+          z-index: 3;
+          background: #f9faf6;
+        }
+        .heading {
+          flex-wrap: wrap;
+        }
+        .heading p {
+          max-width: none;
+        }
+        .heading > .btn {
+          min-height: 42px;
+        }
+        .content {
+          padding-bottom: 110px;
+        }
+        .filters input {
+          max-width: 100%;
+          min-width: 0;
+        }
+        .filters .period {
+          margin-left: 0;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .card .filters {
+          gap: 8px;
+        }
+        .row .amount {
+          font-size: 12px;
+        }
+        .mobile-nav button {
+          min-height: 48px;
+        }
+        .chat-form input {
+          font-size: 16px;
+        }
+        .field input,
+        .field select {
+          font-size: 16px;
+        }
+        dialog {
+          max-height: calc(100dvh - 32px);
+        }
+      }
+    </style>
+  <link rel="stylesheet" href="voice-invoice.css">
+</head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="logo">▥</span>
+          <div>LedgerVision<small>BUSINESS IN FOCUS</small></div>
+        </div>
+        <div class="workspace">
+          <span class="row-icon">☕</span>
+          <div><b>Dara's Coffee</b><small>Business workspace</small></div>
+        </div>
+        <nav class="nav" aria-label="Main navigation"></nav>
+        <div class="sidebar-bottom">
+          <div class="demo-note">
+            <b>A little clarity. A lot of possibility.</b><br />Your finances,
+            all in one place.<br /><span class="muted"
+              >Interactive demo · local data</span
+            >
+          </div>
+          <label class="field"
+            >Preview as<select id="role" class="role">
+              <option value="owner">Dara · Business owner</option>
+              <option value="manager">Sokha · BKK manager</option>
+            </select></label
+          >
+        </div>
+      </aside>
+      <main>
+        <header class="topbar">
+          <span id="breadcrumb">Workspace / Overview</span>
+          <div class="topbar-right">
+            <span class="badge">● DEMO WORKSPACE</span
+            ><button
+              class="avatar"
+              data-page="settings"
+              aria-label="Open profile and settings"
+            >
+              DS
+            </button>
+          </div>
+        </header>
+        <div id="content" class="content"></div>
+      </main>
+    </div>
+    <nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+    <dialog id="modal"></dialog>
+    <div class="toast" role="status" aria-live="polite" id="toast"></div>
+    <script>
+      "use strict";
+      const paths = {
+        home: "M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z",
+        transactions: "M5 3h14v18l-3-2-4 2-4-2-3 2V3m4 5h6m-6 4h6",
+        capture: "M4 7h4l2-3h4l2 3h4v13H4z M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+        ai: "m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3z",
+        reports: "M4 20h16M7 16V9m5 7V4m5 12v-5",
+        settings: "M4 7h16M4 17h16M8 4v6m8 4v6",
+        plus: "M12 5v14M5 12h14",
+        up: "M5 17 17 5M5 5h12v12",
+        down: "m5 7 12 12M5 19h12V7",
+        download: "M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5",
+        branch: "M3 9h18L19 3H5zM5 9v12h14V9M9 21v-7h6v7",
+      };
+      const icon = (n) =>
+        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[n] || paths.transactions}"/></svg>`;
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const money = (n) =>
+        new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 2,
+        }).format(n);
+      const branches = ["BKK", "Toul Kork", "Siem Reap"];
+      const KEY = "ledgervision-demo-v2";
+      function seed() {
+        let rows = [];
+        let id = 1;
+        const rev = [8400, 7200, 9800],
+          cost = [5100, 4500, 6600];
+        for (let m = 4; m <= 9; m++)
+          branches.forEach((b, i) => {
+            const factor = 1 - (9 - m) * 0.055;
+            let income = Math.round(rev[i] * factor),
+              expense = Math.round(cost[i] * factor);
+            [
+              ["Coffee sales", "Sales", "income", income - 890, 12],
+              ["Counter sales", "Sales", "income", 890, 28],
+              ["Monthly rent", "Rent", "expense", Math.round(expense * 0.4), 2],
+              [
+                "Team payroll",
+                "Payroll",
+                "expense",
+                Math.round(expense * 0.35),
+                24,
+              ],
+              [
+                "Angkor Market",
+                "Ingredients",
+                "expense",
+                expense -
+                  Math.round(expense * 0.4) -
+                  Math.round(expense * 0.35) -
+                  95,
+                27,
+              ],
+              ["Cloud software", "Software", "expense", 95, 29],
+            ].forEach(([name, category, type, amount, day]) =>
+              rows.push({
+                id: id++,
+                name,
+                category,
+                type,
+                amount,
+                branch: b,
+                date: `2026-${String(m).padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
+                note: "Sample transaction",
+              }),
+            );
+          });
+        return rows;
+      }
+      let transactions = seed(),
+        storageOK = true;
+      try {
+        let saved = JSON.parse(localStorage.getItem(KEY));
+        if (
+          Array.isArray(saved) &&
+          saved.every(
+            (t) =>
+              t &&
+              typeof t.name === "string" &&
+              Number.isFinite(t.amount) &&
+              t.amount > 0 &&
+              branches.includes(t.branch) &&
+              ["income", "expense"].includes(t.type) &&
+              /^2026-\d{2}-\d{2}$/.test(t.date),
+          )
+        )
+          transactions = saved;
+      } catch (e) {
+        storageOK = false;
+      }
+      let state = {
+          page: "home",
+          role: "owner",
+          branch: "all",
+          month: "2026-09",
+          search: "",
+          type: "all",
+        },
+        messages = [];
+      let receiptURL = null;
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify(transactions));
+          return true;
+        } catch (e) {
+          storageOK = false;
+          notify("Saved for this session. Browser storage is unavailable.");
+          return false;
+        }
+      }
+      function scoped(month = state.month) {
+        return transactions.filter(
+          (t) =>
+            (state.role === "manager"
+              ? t.branch === "BKK"
+              : state.branch === "all" || t.branch === state.branch) &&
+            t.date.startsWith(month),
+        );
+      }
+      function totals(rows) {
+        const revenue = rows
+            .filter((t) => t.type === "income")
+            .reduce((a, t) => a + t.amount, 0),
+          expenses = rows
+            .filter((t) => t.type === "expense")
+            .reduce((a, t) => a + t.amount, 0);
+        return {
+          revenue,
+          expenses,
+          profit: revenue - expenses,
+          margin: revenue ? ((revenue - expenses) / revenue) * 100 : 0,
+        };
+      }
+      function notify(s) {
+        document.getElementById("toast").textContent = s;
+        clearTimeout(notify.timer);
+        notify.timer = setTimeout(
+          () => (document.getElementById("toast").textContent = ""),
+          3500,
+        );
+      }
+      const navs = [
+        ["home", "Overview"],
+        ["transactions", "Transactions"],
+        ["capture", "Capture receipt"],
+        ["ai", "AI assistant"],
+        ["reports", "Reports"],
+        ["settings", "Settings"],
+      ];
+      function navigate(page) {
+        state.page = page;
+        state.search = "";
+        state.type = "all";
+        render();
+        window.scrollTo(0, 0);
+      }
+      function filters() {
+        return `<div class="filters"><select id="branch" aria-label="Branch" ${state.role === "manager" ? "disabled" : ""}>${state.role === "owner" ? '<option value="all">All branches</option>' : ""}${branches
+          .filter((b) => state.role === "owner" || b === "BKK")
+          .map(
+            (b) =>
+              `<option ${state.branch === b ? "selected" : ""}>${b}</option>`,
+          )
+          .join(
+            "",
+          )}</select><select id="month" class="period" aria-label="Reporting month">${[9, 8, 7, 6, 5, 4].map((m) => `<option value="2026-0${m}" ${state.month === `2026-0${m}` ? "selected" : ""}>${new Date(2026, m - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</option>`).join("")}</select><small>USD · Sample business data</small></div>`;
+      }
+      function heading(title, sub, action = "") {
+        return `<div class="heading"><div><h1>${title}</h1><p>${sub}</p></div>${action}</div>`;
+      }
+      function stats() {
+        let t = totals(scoped());
+        return `<div class="stats">${[
+          ["Total revenue", money(t.revenue), "income received", "up"],
+          ["Total expenses", money(t.expenses), "recorded spending", "down"],
+          ["Net profit", money(t.profit), "revenue minus expenses", "reports"],
+          [
+            "Profit margin",
+            t.margin.toFixed(1) + "%",
+            "of total revenue",
+            "ai",
+          ],
+        ]
+          .map(
+            ([label, value, note, ic], i) =>
+              `<div class="stat ${i === 0 ? "featured" : ""}"><div class="label">${label}${icon(ic)}</div><div class="value">${value}</div><small>${note}</small></div>`,
+          )
+          .join("")}</div>`;
+      }
+      function chart() {
+        let end = Number(state.month.slice(5));
+        let series = Array.from({ length: 6 }, (_, i) => {
+          let m = end - 5 + i;
+          return { m, t: totals(scoped(`2026-${String(m).padStart(2, "0")}`)) };
+        });
+        let max = Math.max(
+          1000,
+          ...series.map((s) => Math.max(s.t.revenue, s.t.expenses)),
+        );
+        let ceiling = Math.ceil(max / 5000) * 5000;
+        return `<div class="card"><div class="card-head"><div><h2>Cash flow</h2><small>Income and spending over time</small></div><div class="legend"><span><i class="dot"></i>Income</span><span><i class="dot expense"></i>Expenses</span></div></div><div class="chart" role="img" aria-label="Six month income and expense chart; hover bars for amounts"><div class="axis"><span>${money(ceiling)}</span><span>${money(ceiling / 2)}</span><span>$0</span></div><div class="bars">${series.map(({ m, t }) => `<div class="bar-group"><div tabindex="0" class="bar" style="height:${(t.revenue / ceiling) * 165}px" title="Income: ${money(t.revenue)}" aria-label="${m}: income ${money(t.revenue)}"></div><div tabindex="0" class="bar expense" style="height:${(t.expenses / ceiling) * 165}px" title="Expenses: ${money(t.expenses)}" aria-label="${m}: expenses ${money(t.expenses)}"></div><small>${new Date(2026, m - 1, 1).toLocaleDateString("en", { month: "short" })}</small></div>`).join("")}</div></div><div class="footer"><span>Six months ending in selected month</span><span>Jan–Mar have no demo entries</span></div></div>`;
+      }
+      function insight() {
+        let t = totals(scoped()),
+          largest = expenseCategories()[0];
+        return `<div class="card"><div class="card-head"><h2> ${icon("ai").replace("<svg", '<svg style="width:17px;height:17px;vertical-align:middle"')} A clearer picture</h2><span class="badge">DEMO AI</span></div><div class="insight"><div class="insight-label">Profitability</div><b>${t.profit >= 0 ? "Your business is in the green." : "Spending is ahead of income."}</b><p>You ${t.profit >= 0 ? "kept" : "lost"} ${money(Math.abs(t.profit))} this month, with a ${t.margin.toFixed(1)}% margin.</p></div><div class="insight"><div class="insight-label">Worth a closer look</div><b>${largest ? esc(largest[0]) + " is your biggest expense." : "Start with your first transaction."}</b><p>${largest ? money(largest[1]) + " in the selected period. Review this category to identify savings." : "Add income or spending to build your business picture."}</p></div><button class="link" style="margin-top:12px" data-page="ai">Explore with your AI assistant →</button></div>`;
+      }
+      function txRows(rows) {
+        return rows.length
+          ? rows
+              .map(
+                (t) =>
+                  `<button class="row transaction-row" data-edit="${t.id}"><span class="row-icon ${t.type === "income" ? "positive" : "negative"}">${icon(t.type === "income" ? "up" : "down")}</span><span class="grow"><b>${esc(t.name)}</b><small>${esc(t.category)} · ${esc(t.branch)} · ${esc(t.date)}</small></span><span class="amount ${t.type === "income" ? "positive" : "negative"}">${t.type === "income" ? "+" : "−"}${money(t.amount)}</span></button>`,
+              )
+              .join("")
+          : '<div class="empty">No transactions found.<br><small>Try another filter or add your first entry.</small></div>';
+      }
+      function recent() {
+        return `<div class="card"><div class="card-head"><h2>Recent transactions</h2><button class="link" data-page="transactions">View all →</button></div>${txRows(
+          scoped()
+            .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)
+            .slice(0, 4),
+        )}</div>`;
+      }
+      function branchCard() {
+        let rows = scoped();
+        let list = (
+          state.role === "manager"
+            ? ["BKK"]
+            : state.branch === "all"
+              ? branches
+              : [state.branch]
+        )
+          .map((b) => ({ b, t: totals(rows.filter((t) => t.branch === b)) }))
+          .sort((a, b) => b.t.revenue - a.t.revenue);
+        let max = Math.max(1, ...list.map((x) => x.t.revenue));
+        return `<div class="card"><div class="card-head"><h2>${state.role === "owner" ? "Branch performance" : "Your branch"}</h2><small>By revenue</small></div>${list.map(({ b, t }) => `<button class="row branch-row" data-branch="${b}"><span class="row-icon">${icon("branch")}</span><span class="grow"><b>${b}</b><small>Profit ${money(t.profit)}</small><span class="progress"><span style="width:${(t.revenue / max) * 100}%"></span></span></span><span class="amount">${money(t.revenue)} →</span></button>`).join("")}</div>`;
+      }
+      function expenseCategories() {
+        let groups = {};
+        scoped()
+          .filter((t) => t.type === "expense")
+          .forEach(
+            (t) => (groups[t.category] = (groups[t.category] || 0) + t.amount),
+          );
+        return Object.entries(groups).sort((a, b) => b[1] - a[1]);
+      }
+      function render() {
+        if (window.invoiceFeature?.render(state.page)) return;
+        renderBase();
+        window.invoiceFeature?.decorate();
+      }
+      function renderBase() {
+        document.querySelectorAll(".nav,.mobile-nav").forEach(
+          (el) =>
+            (el.innerHTML = navs
+              .filter(
+                ([p]) =>
+                  !el.classList.contains("mobile-nav") || p !== "reports",
+              )
+              .map(
+                ([p, l]) =>
+                  `<button data-page="${p}" class="${state.page === p ? "active" : ""}" ${state.page === p ? 'aria-current="page"' : ""}>${icon(p)}<span>${el.classList.contains("mobile-nav") ? { home: "Home", capture: "Capture", ai: "Assistant", settings: "More" }[p] || l : l}</span></button>`,
+              )
+              .join("")),
+        );
+        document.getElementById("breadcrumb").textContent =
+          "Workspace / " + navs.find((n) => n[0] === state.page)[1];
+        document.querySelector(".avatar").textContent =
+          state.role === "owner" ? "DS" : "SK";
+        document.getElementById("role").value = state.role;
+        const add = `<button class="btn primary" data-add>${icon("plus")} Add transaction</button>`;
+        let html = "";
+        if (state.page === "home")
+          html =
+            heading(
+              `A little clarity, ${state.role === "owner" ? "Dara" : "Sokha"}.`,
+              "Here’s how your business is doing. Let’s make it a good month.",
+              add,
+            ) +
+            filters() +
+            stats() +
+            `<div class="grid">${chart()}${insight()}</div><div class="two">${recent()}${branchCard()}</div><div class="footer"><span>LedgerVision · Your business, in focus</span><span>${storageOK ? "Changes saved on this browser" : "Session-only storage"}</span></div>`;
+        if (state.page === "transactions")
+          html =
+            heading(
+              "Every detail, accounted for.",
+              "Track, review, and organize your business transactions.",
+              add,
+            ) +
+            filters() +
+            `<div class="card"><div class="filters"><input id="search" type="search" placeholder="Search merchant or category…" aria-label="Search transactions"><select id="type" aria-label="Transaction type"><option value="all">All types</option><option value="income">Income</option><option value="expense">Expenses</option></select><button class="btn period" data-export>${icon("download")} Export CSV</button></div><div id="tx-list"></div><small id="tx-count"></small></div>`;
+        if (state.page === "reports") {
+          let t = totals(scoped()),
+            score = Math.max(0, Math.min(100, Math.round(t.margin * 2 + 10)));
+          html =
+            heading(
+              "The bigger picture.",
+              "A practical snapshot of your business performance.",
+              `<button class="btn" data-export>${icon("download")} Export CSV</button>`,
+            ) +
+            filters() +
+            stats() +
+            `<div class="grid">${chart()}<div class="card"><div class="card-head"><h2>Spending breakdown</h2></div>${
+              expenseCategories()
+                .map(
+                  ([c, a]) =>
+                    `<div class="row"><div class="grow"><b>${esc(c)}</b><div class="progress"><span style="width:${t.expenses ? (a / t.expenses) * 100 : 0}%"></span></div></div><span>${money(a)}</span></div>`,
+                )
+                .join("") || "<p>No expenses this month.</p>"
+            }</div><div class="card full"><div class="health"><div class="ring" style="--score:${score}%"><span>${score}</span></div><div><h2>Demo business health</h2><p class="muted">${t.profit >= 0 ? "Income is covering expenses." : "Expenses exceed income."} Your profit margin is ${t.margin.toFixed(1)}%.</p><small>Illustrative score: margin × 2 + 10, capped between 0 and 100.</small></div></div></div></div>`;
+        }
+        if (state.page === "capture")
+          html =
+            heading(
+              "From receipt to record.",
+              "Keep the paperwork. Lose the busywork.",
+            ) +
+            `<div class="capture-panel card"><div class="insight-label">Receipt capture · simulated extraction</div><h2>Add an expense in a few steps</h2><p class="muted">Upload an image for preview, then enter its details. Or use our sample receipt to try the complete demo.</p><div class="drop">${icon("capture")}<h2 style="margin-top:12px">Your next receipt starts here</h2><p class="muted">JPG, PNG or WebP · up to 5 MB</p><input id="receipt" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Upload receipt image"><div id="receipt-preview"></div></div><div class="form-actions"><button class="btn" data-manual>Enter manually</button><button class="btn primary" data-sample>Try sample receipt →</button></div><p><small>Demo only: no OCR service or upload. Your image stays in this browser session.</small></p></div>`;
+        if (state.page === "ai")
+          html =
+            heading(
+              "A fresh perspective.",
+              "Ask a question. Find the story behind your numbers.",
+            ) +
+            filters() +
+            `<div class="chat"><div class="insight"><b>${icon("ai").replace("<svg", '<svg style="height:16px;width:16px;vertical-align:middle"')} Your demo financial assistant</b><p>Answers are generated from your selected branch and month using local demo rules. Try revenue, expenses, profit, or branch performance.</p></div><div id="messages" aria-live="polite"></div><div class="suggestions">${["How is my business doing?", "What are my biggest expenses?", "Compare my branches"].map((q) => `<button class="btn" data-ask="${q}">${q}</button>`).join("")}</div><form class="chat-form" id="chat-form"><input required maxlength="500" id="question" placeholder="Ask about your business…" aria-label="Question for demo assistant"><button class="btn primary">Ask →</button></form></div>`;
+        if (state.page === "settings")
+          html =
+            heading(
+              "Make yourself at home.",
+              "Switch perspectives and manage your demo workspace.",
+            ) +
+            `<div class="two"><div class="card"><h2>Your workspace</h2><p>Dara’s Coffee · USD</p><label class="field">Preview role<select id="settings-role"><option value="owner" ${state.role === "owner" ? "selected" : ""}>Dara · Business owner</option><option value="manager" ${state.role === "manager" ? "selected" : ""}>Sokha · BKK branch manager</option></select></label><p class="muted">Owners can explore all three branches. The manager demo is scoped to BKK across transactions, reports, and assistant answers.</p><button class="btn" data-page="reports">${icon("reports")} Open reports</button></div><div class="card"><h2>Demo data</h2><p class="muted">Explore April–September 2026 sample data. Changes persist in this browser when local storage is available.</p><p><small>This is a frontend demo. Role switching simulates access and is not authentication. No live banking, cloud AI, or OCR is connected.</small></p><button class="btn" data-reset>Reset demo data</button></div></div>`;
+        document.getElementById("content").innerHTML = html;
+        if (state.page === "transactions") updateTransactions();
+        if (state.page === "ai") renderMessages();
+        document.getElementById("branch")?.addEventListener("change", (e) => {
+          state.branch = e.target.value;
+          messages = [];
+          render();
+        });
+        document.getElementById("month")?.addEventListener("change", (e) => {
+          state.month = e.target.value;
+          messages = [];
+          render();
+        });
+        document.getElementById("search")?.addEventListener("input", (e) => {
+          state.search = e.target.value;
+          updateTransactions();
+        });
+        document.getElementById("type")?.addEventListener("change", (e) => {
+          state.type = e.target.value;
+          updateTransactions();
+        });
+        document
+          .getElementById("settings-role")
+          ?.addEventListener("change", (e) => setRole(e.target.value));
+        document
+          .getElementById("chat-form")
+          ?.addEventListener("submit", (e) => {
+            e.preventDefault();
+            let input = document.getElementById("question");
+            ask(input.value);
+            input.value = "";
+          });
+        document
+          .getElementById("receipt")
+          ?.addEventListener("change", uploadReceipt);
+      }
+      function filtered() {
+        return scoped()
+          .filter(
+            (t) =>
+              (state.type === "all" || t.type === state.type) &&
+              `${t.name} ${t.category} ${t.branch}`
+                .toLowerCase()
+                .includes(state.search.toLowerCase()),
+          )
+          .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+      }
+      function updateTransactions() {
+        let rows = filtered();
+        document.getElementById("tx-list").innerHTML = txRows(rows);
+        document.getElementById("tx-count").textContent =
+          `${rows.length} transactions · Click an entry to review or edit`;
+      }
+      function setRole(role) {
+        if (!["owner", "manager"].includes(role)) return;
+        state.role = role;
+        state.branch = role === "manager" ? "BKK" : "all";
+        messages = [];
+        render();
+        if (window.parent !== window)
+          window.parent.postMessage({ type: "ledgervision-role", role }, "*");
+        notify(
+          role === "manager"
+            ? "Viewing BKK as Sokha"
+            : "Viewing all branches as Dara",
+        );
+      }
+      function renderMessages() {
+        document.getElementById("messages").innerHTML = messages
+          .map((m) => `<div class="bubble ${m.role}">${esc(m.text)}</div>`)
+          .join("");
+      }
+      function ask(q) {
+        q = q.trim();
+        if (!q) return;
+        let t = totals(scoped()),
+          answer;
+        let scope = state.branch === "all" ? "all branches" : state.branch;
+        if (/expense|spend|cost/i.test(q)) {
+          answer =
+            "Your expenses total " +
+            money(t.expenses) +
+            ".\n\n" +
+            expenseCategories()
+              .map(
+                ([c, a]) =>
+                  `${c}: ${money(a)} (${t.expenses ? ((a / t.expenses) * 100).toFixed(1) : 0}%)`,
+              )
+              .join("\n") +
+            "\n\nReview the largest category first for possible savings.";
+        } else if (/branch|compare/i.test(q)) {
+          answer =
+            state.role === "manager"
+              ? "You’re viewing BKK only. BKK earned " +
+                money(t.revenue) +
+                " with " +
+                money(t.profit) +
+                " in profit. Switch to the owner role in Settings to compare branches."
+              : branches
+                  .map((b) => {
+                    let x = totals(scoped().filter((r) => r.branch === b));
+                    return `${b}: ${money(x.revenue)} revenue · ${money(x.profit)} profit`;
+                  })
+                  .join("\n") +
+                "\n\nSelect All branches to include every location.";
+        } else if (
+          /business|doing|profit|revenue|income|margin|summary/i.test(q)
+        ) {
+          answer = `For ${scope} in ${state.month}:\n\nRevenue: ${money(t.revenue)}\nExpenses: ${money(t.expenses)}\nNet profit: ${money(t.profit)}\nProfit margin: ${t.margin.toFixed(1)}%\n\n${t.profit >= 0 ? "Income is covering recorded expenses. Keep an eye on your largest spending categories." : "Recorded spending exceeds income. Review expenses and sales for this period."}`;
+        } else
+          answer =
+            "This demo can summarize revenue, profit, expenses, and branch performance. Try “What are my biggest expenses?” or “How is my business doing?”";
+        messages.push(
+          { role: "user", text: q },
+          { role: "assistant", text: answer },
+        );
+        renderMessages();
+      }
+      const modal = document.getElementById("modal");
+      function openModal(html) {
+        modal.innerHTML = html;
+        modal.showModal();
+      }
+      function closeModal() {
+        modal.close();
+        if (receiptURL) {
+          URL.revokeObjectURL(receiptURL);
+          receiptURL = null;
+        }
+      }
+      function transactionForm(id = null, preset = {}) {
+        let existing =
+          id === null ? null : transactions.find((t) => t.id === id);
+        if (existing && state.role === "manager" && existing.branch !== "BKK")
+          return;
+        let t = existing || {
+          name: "",
+          type: "expense",
+          amount: "",
+          date: state.month + "-30",
+          category: "Ingredients",
+          branch: state.branch === "all" ? "BKK" : state.branch,
+          note: "",
+          ...preset,
+        };
+        openModal(
+          `<div class="dialog-head"><div><div class="insight-label">${preset.sample ? "Sample receipt · review before saving" : "Your ledger"}</div><h2>${existing ? "Transaction details" : "Add a transaction"}</h2></div><button class="close" data-close aria-label="Close">×</button></div>${receiptURL ? `<img class="receipt-preview" src="${receiptURL}" alt="Your uploaded receipt">` : ""}<form id="transaction-form"><div class="form-grid"><label class="field full">Merchant or description<input name="name" required maxlength="80" value="${esc(t.name)}" placeholder="e.g. Angkor Market"></label><label class="field">Type<select name="type">${["expense", "income"].map((v) => `<option value="${v}" ${t.type === v ? "selected" : ""}>${v === "income" ? "Income" : "Expense"}</option>`).join("")}</select></label><label class="field">Amount (USD)<input name="amount" type="number" min="0.01" max="99999999" step="0.01" required value="${t.amount}"></label><label class="field">Date<input name="date" type="date" min="2026-04-01" max="2026-09-30" required value="${t.date}"></label><label class="field">Branch<select name="branch">${branches
+            .filter((b) => state.role === "owner" || b === "BKK")
+            .map(
+              (b) =>
+                `<option ${t.branch === b ? "selected" : ""}>${b}</option>`,
+            )
+            .join(
+              "",
+            )}</select></label><label class="field full">Category<select name="category">${["Ingredients", "Sales", "Rent", "Payroll", "Software", "Utilities", "Other"].map((c) => `<option ${t.category === c ? "selected" : ""}>${c}</option>`).join("")}</select></label><label class="field full">Note (optional)<input name="note" maxlength="200" value="${esc(t.note || "")}"></label></div><p><small>Demo dates: April–September 2026. Saving opens the entry’s month.</small></p><div class="form-actions">${existing ? `<button type="button" class="btn negative" data-delete="${id}">Delete</button>` : ""}<button type="button" class="btn" data-close>Cancel</button><button class="btn primary">${existing ? "Save changes" : "Save transaction"}</button></div></form>`,
+        );
+        document
+          .getElementById("transaction-form")
+          .addEventListener("submit", (e) => {
+            e.preventDefault();
+            let values = Object.fromEntries(new FormData(e.target));
+            values.name = values.name.trim();
+            if (!values.name) {
+              e.target.elements.name.setCustomValidity(
+                "Enter a merchant or description.",
+              );
+              e.target.elements.name.reportValidity();
+              return;
+            }
+            values.amount = Number(values.amount);
+            values.id = existing
+              ? id
+              : Math.max(0, ...transactions.map((t) => t.id)) + 1;
+            if (state.role === "manager") values.branch = "BKK";
+            if (existing)
+              transactions = transactions.map((t) =>
+                t.id === id ? values : t,
+              );
+            else transactions.push(values);
+            let persisted = save();
+            state.month = values.date.slice(0, 7);
+            state.branch = values.branch;
+            closeModal();
+            navigate("transactions");
+            notify(
+              persisted
+                ? "Transaction saved. Your dashboard is up to date."
+                : "Transaction saved for this session only.",
+            );
+          });
+        document
+          .querySelector('[name="name"]')
+          .addEventListener("input", (e) => e.target.setCustomValidity(""));
+      }
+      function uploadReceipt(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (
+          !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+          file.size > 5 * 1024 * 1024
+        ) {
+          notify("Choose a JPG, PNG or WebP image under 5 MB.");
+          e.target.value = "";
+          return;
+        }
+        if (receiptURL) URL.revokeObjectURL(receiptURL);
+        receiptURL = URL.createObjectURL(file);
+        transactionForm(null, { note: "Entered from receipt: " + file.name });
+      }
+      function exportCSV() {
+        let rows = state.page === "transactions" ? filtered() : scoped();
+        const cell = (v) =>
+          '"' +
+          String(v)
+            .replace(/^[=+@-]/, "'$&")
+            .replace(/"/g, '""') +
+          '"';
+        let csv = [
+          [
+            "Date",
+            "Merchant",
+            "Category",
+            "Type",
+            "Branch",
+            "Amount USD",
+            "Note",
+          ],
+          ...rows.map((t) => [
+            t.date,
+            t.name,
+            t.category,
+            t.type,
+            t.branch,
+            t.amount,
+            t.note || "",
+          ]),
+        ]
+          .map((r) => r.map(cell).join(","))
+          .join("\r\n");
+        let url = URL.createObjectURL(
+          new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }),
+        );
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = `ledgervision-${state.month}.csv`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        notify(`Exported ${rows.length} transactions`);
+      }
+      document.addEventListener("click", (e) => {
+        let b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.page) navigate(b.dataset.page);
+        if (b.hasAttribute("data-add") || b.hasAttribute("data-manual"))
+          transactionForm();
+        if (b.dataset.edit) transactionForm(Number(b.dataset.edit));
+        if (b.dataset.branch) {
+          state.branch = b.dataset.branch;
+          navigate("reports");
+        }
+        if (b.hasAttribute("data-close")) closeModal();
+        if (b.dataset.ask) ask(b.dataset.ask);
+        if (b.hasAttribute("data-export")) exportCSV();
+        if (b.hasAttribute("data-sample"))
+          transactionForm(null, {
+            name: "Angkor Market",
+            amount: 125,
+            category: "Ingredients",
+            note: "Simulated receipt extraction · Sample receipt",
+            sample: true,
+          });
+        if (b.dataset.delete) {
+          let id = Number(b.dataset.delete);
+          openDelete(id);
+        }
+        if (b.hasAttribute("data-reset"))
+          openModal(
+            `<div class="dialog-head"><h2>Reset your demo workspace?</h2><button class="close" data-close aria-label="Close">×</button></div><p>This removes your demo changes and restores the original sample transactions.</p><div class="form-actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="confirm-reset">Reset demo</button></div>`,
+          );
+        if (b.id === "confirm-reset") {
+          transactions = seed();
+          save();
+          messages = [];
+          state.month = "2026-09";
+          state.branch = state.role === "manager" ? "BKK" : "all";
+          closeModal();
+          render();
+          notify("Demo data restored");
+        }
+        if (b.id === "confirm-delete") {
+          transactions = transactions.filter(
+            (t) => t.id !== Number(b.dataset.id),
+          );
+          save();
+          closeModal();
+          render();
+          notify("Transaction deleted");
+        }
+      });
+      function openDelete(id) {
+        modal.innerHTML = `<div class="dialog-head"><h2>Delete this transaction?</h2><button class="close" data-close aria-label="Close">×</button></div><p>It will be removed from your ledger and dashboard totals.</p><div class="form-actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="confirm-delete" data-id="${id}">Delete transaction</button></div>`;
+      }
+      document
+        .getElementById("role")
+        .addEventListener("change", (e) => setRole(e.target.value));
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          const r = modal.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            closeModal();
+        }
+      });
+      modal.addEventListener("cancel", () => {
+        if (receiptURL) {
+          URL.revokeObjectURL(receiptURL);
+          receiptURL = null;
+        }
+      });
+      render();
+      window.addEventListener("message", (e) => {
+        if (
+          e.source === window.parent &&
+          e.data?.type === "ledgervision-set-role"
+        )
+          setRole(e.data.role);
+      });
+    </script>
+  <script src="voice-invoice.js"></script>
+</body>
+</html>

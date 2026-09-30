@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LedgerVision · Mobile demo studio</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font:
+          14px "Segoe UI",
+          system-ui,
+          sans-serif;
+        color: #203b32;
+        background:
+          radial-gradient(ellipse at 70% 25%, #e8eedb, transparent 55%), #f3f5ef;
+        min-height: 100vh;
+      }
+      button,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      select:focus-visible {
+        outline: 3px solid #7daa68;
+        outline-offset: 3px;
+      }
+      .studio {
+        max-width: 1080px;
+        margin: auto;
+        padding: 42px 28px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 80px;
+        align-items: start;
+      }
+      .panel {
+        padding-top: 32px;
+        position: sticky;
+        top: 25px;
+      }
+      .brand {
+        display: flex;
+        gap: 11px;
+        align-items: center;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -1px;
+      }
+      .logo {
+        background: #216652;
+        color: #dcf1a7;
+        padding: 7px 12px;
+        border-radius: 13px;
+        font-size: 28px;
+      }
+      .eyebrow {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: #73826e;
+        margin: 34px 0 12px;
+      }
+      h1 {
+        font-size: 34px;
+        font-weight: 600;
+        line-height: 1.16;
+        letter-spacing: -1.2px;
+        margin: 0 0 15px;
+      }
+      p {
+        color: #788373;
+        line-height: 1.8;
+        font-size: 13px;
+      }
+      .controls {
+        margin-top: 30px;
+        border-top: 1px solid #dbe3d4;
+        padding-top: 25px;
+      }
+      .label {
+        display: block;
+        font-size: 12px;
+        font-weight: 650;
+        margin-bottom: 12px;
+      }
+      .roles {
+        display: grid;
+        gap: 9px;
+      }
+      .role {
+        background: #ffffff90;
+        border: 1px solid #dce4d4;
+        border-radius: 11px;
+        text-align: left;
+        padding: 14px 15px;
+        color: #496044;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .role b {
+        font-size: 13px;
+      }
+      .role small {
+        display: block;
+        font-size: 11px;
+        margin-top: 5px;
+        opacity: 0.7;
+      }
+      .role.active {
+        background: #216652;
+        border-color: #216652;
+        color: white;
+        box-shadow: 0 7px 20px #21665218;
+      }
+      .role span {
+        font-size: 18px;
+      }
+      .size-control {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+      }
+      .size-control select {
+        padding: 9px;
+        background: #fff;
+        border: 1px solid #dce4d4;
+        border-radius: 8px;
+        color: #344c30;
+        max-width: 175px;
+      }
+      .note {
+        background: #e9eedf;
+        padding: 15px 17px;
+        border-radius: 11px;
+        font-size: 12px;
+        line-height: 1.8;
+        color: #6f7d65;
+        margin-top: 25px;
+      }
+      .note b {
+        color: #405936;
+      }
+      .hint {
+        font-size: 11px;
+        line-height: 1.9;
+        color: #87917e;
+        margin-top: 20px;
+      }
+      .preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 0;
+      }
+      .device-label {
+        font-size: 10px;
+        letter-spacing: 1.8px;
+        color: #829075;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        background: #6c9660;
+        border-radius: 50%;
+      }
+      .phone {
+        --screen-width: 390px;
+        width: calc(var(--screen-width) + 18px);
+        height: 844px;
+        max-width: 100%;
+        background: #f9faf6;
+        border: 9px solid #22302b;
+        border-radius: 48px;
+        box-shadow:
+          0 0 0 1px #586354,
+          0 24px 65px #25362126,
+          0 5px 10px #25362112;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .statusbar {
+        height: 43px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 23px 0;
+        background: #f9faf6;
+        font-size: 12px;
+        font-weight: 700;
+        color: #25352d;
+        position: relative;
+      }
+      .island {
+        position: absolute;
+        left: 50%;
+        top: 9px;
+        transform: translateX(-50%);
+        width: 106px;
+        height: 26px;
+        background: #22302b;
+        border-radius: 18px;
+      }
+      .status-icons {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .status-icons svg {
+        width: 15px;
+        height: 13px;
+      }
+      .battery {
+        width: 20px;
+        height: 10px;
+        border: 1px solid #4b5a4b;
+        border-radius: 3px;
+        padding: 1px;
+        position: relative;
+      }
+      .battery:before {
+        content: "";
+        display: block;
+        background: #354c37;
+        height: 100%;
+        border-radius: 1px;
+      }
+      .battery:after {
+        content: "";
+        position: absolute;
+        right: -3px;
+        top: 2px;
+        width: 2px;
+        height: 4px;
+        background: #354c37;
+        border-radius: 1px;
+      }
+      iframe {
+        border: 0;
+        display: block;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        background: #f5f6f2;
+      }
+      .home-indicator {
+        height: 18px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        background: white;
+      }
+      .home-indicator:before {
+        content: "";
+        width: 110px;
+        height: 4px;
+        border-radius: 5px;
+        background: #26392d;
+      }
+      .caption {
+        margin-top: 18px;
+        color: #89927f;
+        font-size: 11px;
+        text-align: center;
+      }
+      .phone.compact {
+        --screen-width: 360px;
+        height: 780px;
+      }
+      @media (max-width: 850px) {
+        .studio {
+          gap: 30px;
+          padding: 28px 20px;
+          grid-template-columns: 240px 1fr;
+        }
+        h1 {
+          font-size: 28px;
+        }
+        .phone {
+          height: 820px;
+        }
+        .panel {
+          padding-top: 15px;
+        }
+      }
+      @media (max-width: 680px) {
+        .studio {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 22px 12px;
+          gap: 25px;
+        }
+        .panel {
+          position: static;
+          width: 100%;
+          max-width: 410px;
+          padding: 0;
+        }
+        .brand {
+          font-size: 21px;
+        }
+        .logo {
+          font-size: 22px;
+        }
+        .eyebrow,
+        h1,
+        .intro,
+        .hint,
+        .note,
+        .size-control {
+          display: none;
+        }
+        .controls {
+          border: 0;
+          padding: 0;
+          margin-top: 18px;
+        }
+        .controls > .label {
+          font-size: 11px;
+          margin-bottom: 8px;
+        }
+        .roles {
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+        .role {
+          padding: 10px;
+        }
+        .role b {
+          font-size: 11px;
+        }
+        .role small {
+          font-size: 10px;
+        }
+        .role span {
+          display: none;
+        }
+        .preview {
+          width: 100%;
+        }
+        .phone {
+          height: min(844px, 85dvh);
+          min-height: 540px;
+          border-width: 7px;
+          border-radius: 36px;
+        }
+        .phone.compact {
+          height: min(780px, 85dvh);
+        }
+        .device-label {
+          margin-bottom: 12px;
+        }
+        .statusbar {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        .caption {
+          font-size: 10px;
+        }
+        .island {
+          width: 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="studio">
+      <aside class="panel">
+        <div class="brand"><span class="logo">▥</span>LedgerVision</div>
+        <div class="eyebrow">MOBILE DEMO STUDIO</div>
+        <h1>Your business.<br />In your pocket.</h1>
+        <p class="intro">
+          Explore the mobile experience. Navigate, capture a receipt, and follow
+          your numbers—all inside the phone.
+        </p>
+        <div class="controls">
+          <span class="label">Test a perspective</span>
+          <div class="roles">
+            <button class="role active" data-role="owner" aria-pressed="true">
+              <div><b>Business owner</b><small>Dara · All branches</small></div>
+              <span>↗</span></button
+            ><button class="role" data-role="manager" aria-pressed="false">
+              <div><b>Branch manager</b><small>Sokha · BKK branch</small></div>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+        <label class="size-control"
+          >Screen size<select id="screen-size">
+            <option value="standard">390 px · Standard</option>
+            <option value="compact">360 px · Compact</option>
+          </select></label
+        >
+        <div class="note">
+          <b>A working mobile demo</b><br />Scroll inside the phone and use the
+          bottom navigation. Your changes stay saved in this browser.
+        </div>
+        <div class="hint">
+          Sample data · April–September 2026<br />AI and receipt extraction are
+          simulated.<br />Reset your data from More → Reset demo data.
+        </div>
+      </aside>
+      <section class="preview" aria-label="Interactive mobile phone simulator">
+        <div class="device-label">
+          <span class="live-dot"></span> Interactive mobile preview
+        </div>
+        <div class="phone" id="phone">
+          <div class="statusbar" aria-hidden="true">
+            <span>9:41</span>
+            <div class="island"></div>
+            <div class="status-icons">
+              <svg viewBox="0 0 18 14" fill="currentColor">
+                <path
+                  d="M1 10h3v4H1zm4-3h3v7H5zm4-3h3v10H9zm4-3h3v13h-3z"
+                /></svg
+              ><svg
+                viewBox="0 0 20 14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M2 4q8-7 16 0M5 7q5-4 10 0M8 10q2-2 4 0" />
+                <circle cx="10" cy="12" r="1" fill="currentColor" /></svg
+              ><span class="battery"></span>
+            </div>
+          </div>
+          <iframe
+            id="app"
+            src="ledgervision_app.html"
+            title="LedgerVision interactive mobile app"
+          ></iframe>
+          <div class="home-indicator" aria-hidden="true"></div>
+        </div>
+        <div class="caption">
+          Fully interactive · Scroll within the screen to explore
+        </div>
+      </section>
+    </main>
+    <script>
+      const app = document.getElementById("app");
+      function showRole(role) {
+        document.querySelectorAll("[data-role]").forEach((b) => {
+          const active = b.dataset.role === role;
+          b.classList.toggle("active", active);
+          b.setAttribute("aria-pressed", String(active));
+        });
+      }
+      document.querySelectorAll("[data-role]").forEach((b) =>
+        b.addEventListener("click", () => {
+          showRole(b.dataset.role);
+          app.contentWindow.postMessage(
+            { type: "ledgervision-set-role", role: b.dataset.role },
+            "*",
+          );
+        }),
+      );
+      window.addEventListener("message", (e) => {
+        if (
+          e.source === app.contentWindow &&
+          e.data?.type === "ledgervision-role" &&
+          ["owner", "manager"].includes(e.data.role)
+        )
+          showRole(e.data.role);
+      });
+      app.addEventListener("load", () => {
+        app.contentWindow.postMessage(
+          {
+            type: "ledgervision-set-role",
+            role: document.querySelector(".role.active").dataset.role,
+          },
+          "*",
+        );
+      });
+      document
+        .getElementById("screen-size")
+        .addEventListener("change", (e) =>
+          document
+            .getElementById("phone")
+            .classList.toggle("compact", e.target.value === "compact"),
+        );
+    </script>
+  </body>
+</html>

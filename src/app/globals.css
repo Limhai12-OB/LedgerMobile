@@ -1,0 +1,89 @@
+@import "tailwindcss";
+@source "../";
+
+@theme inline {
+  --color-ink: #172d2c;
+  --color-muted: #74817d;
+  --color-brand: #216652;
+  --color-lime: #dcf1a7;
+  --color-canvas: #f5f6f2;
+  --color-line: #e4e9e2;
+  --color-danger: #b95343;
+  --font-sans: "Segoe UI", system-ui, sans-serif;
+}
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-sm text-ink;
+  }
+  button,
+  select {
+    @apply cursor-pointer;
+  }
+  button:disabled,
+  select:disabled {
+    @apply cursor-default opacity-60;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-3 outline-offset-2 outline-[#82bca5];
+  }
+  input,
+  select,
+  textarea {
+    @apply min-w-0;
+  }
+  button,
+  a,
+  input,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+@layer components {
+  .card {
+    @apply rounded-[14px] border border-line bg-white p-[19px];
+  }
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[9px] border border-line bg-white px-4 py-2.5 text-xs font-semibold transition hover:brightness-95 disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-brand bg-brand text-white;
+  }
+  .field {
+    @apply grid gap-2 text-xs font-semibold;
+  }
+  .input {
+    @apply w-full rounded-lg border border-[#dce3d8] bg-white p-3 text-base font-normal text-ink;
+  }
+  .badge {
+    @apply rounded-full bg-[#eaf1df] px-2.5 py-1.5 text-[10px] tracking-wide text-brand;
+  }
+  .link {
+    @apply inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-brand;
+  }
+  .muted-copy {
+    @apply text-xs leading-7 text-muted;
+  }
+  .action-bar {
+    @apply sticky bottom-[74px] z-10 mt-5 flex flex-wrap gap-2 bg-canvas/95 py-3 backdrop-blur-sm;
+  }
+}
+@keyframes listening {
+  50% {
+    box-shadow: 0 0 0 22px #eaf1e280;
+  }
+}
+.listening {
+  animation: listening 1.5s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
