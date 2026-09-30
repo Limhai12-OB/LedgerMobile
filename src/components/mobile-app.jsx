@@ -146,7 +146,7 @@ export default function MobileApp() {
         <main className="px-[18px] pt-6 pb-[110px]">
           {page === "home" && <Dashboard />}
           {page === "transactions" && <Transactions />}
-          {page === "capture" && <Capture />}
+          {page === "capture" && <Capture key={role} />}
           {page === "ai" && <Assistant key={`${role}-${branch}-${month}`} />}
           {page === "reports" && <Reports />}
           {page === "settings" && <Settings />}

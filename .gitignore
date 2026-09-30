@@ -3,5 +3,5 @@ node_modules/
 out/
 coverage/
 *.log
-.env*
 !.env.example
+config.bat

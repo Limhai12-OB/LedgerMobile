@@ -11,6 +11,8 @@ import {
   monthLabel,
   scopeTransactions,
   seed,
+  shiftMonth,
+  percentChange,
 } from "@/lib/ledger";
 import { Button, Field, Heading, Icon, Modal } from "./ui";
 
@@ -18,26 +20,30 @@ export function Filters() {
   const { role, branch, setBranch, month, setMonth } = useLedger();
   return (
     <div className="mb-5 flex flex-wrap items-center gap-2.5">
-      <select
-        aria-label="Branch"
-        disabled={role === "manager"}
-        value={role === "manager" ? "BKK" : branch}
-        onChange={(e) => setBranch(e.target.value)}
-        className="max-w-[48%] rounded-lg border border-line bg-white px-3 py-2.5 text-xs"
-      >
-        {role === "owner" && <option value="all">All branches</option>}
-        {BRANCHES.filter((b) => role === "owner" || b === "BKK").map((b) => (
-          <option key={b}>{b}</option>
-        ))}
-      </select>
+      {role === "manager" ? (
+        <span className="badge">BKK Branch - Automatically assigned</span>
+      ) : (
+        <select
+          aria-label="Branch"
+          disabled={role === "manager"}
+          value={role === "manager" ? "BKK" : branch}
+          onChange={(e) => setBranch(e.target.value)}
+          className="max-w-[48%] rounded-lg border border-line bg-white px-3 py-2.5 text-xs"
+        >
+          {role === "owner" && <option value="all">All branches</option>}
+          {BRANCHES.filter((b) => role === "owner" || b === "BKK").map((b) => (
+            <option key={b}>{b}</option>
+          ))}
+        </select>
+      )}
       <select
         aria-label="Reporting month"
         value={month}
         onChange={(e) => setMonth(e.target.value)}
         className="max-w-[48%] rounded-lg border border-line bg-white px-3 py-2.5 text-xs"
       >
-        {[9, 8, 7, 6, 5, 4].map((m) => {
-          const v = `2026-0${m}`;
+        {[12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((m) => {
+          const v = `2026-${String(m).padStart(2, "0")}`;
           return (
             <option key={v} value={v}>
               {monthLabel(v)}
@@ -52,13 +58,26 @@ export function Filters() {
   );
 }
 function Stats() {
-  const { rows } = useLedger();
+  const { rows, transactions, role, branch, month } = useLedger();
   const t = ledgerTotals(rows);
+  const previous = ledgerTotals(
+    scopeTransactions(transactions, role, branch, shiftMonth(month, -1)),
+  );
   return (
     <div className="mb-5 grid grid-cols-2 gap-2.5">
       {[
-        ["Total revenue", money(t.revenue), "income received", "up"],
-        ["Total expenses", money(t.expenses), "recorded spending", "down"],
+        [
+          "Total revenue",
+          money(t.revenue),
+          percentChange(t.revenue, previous.revenue),
+          "up",
+        ],
+        [
+          "Total expenses",
+          money(t.expenses),
+          percentChange(t.expenses, previous.expenses),
+          "down",
+        ],
         ["Net profit", money(t.profit), "revenue minus expenses", "reports"],
         ["Profit margin", t.margin.toFixed(1) + "%", "of total revenue", "ai"],
       ].map(([label, amount, note, icon], i) => (
@@ -88,17 +107,10 @@ function Stats() {
 function Chart() {
   const { transactions, role, branch, month } = useLedger();
   const series = Array.from({ length: 6 }, (_, i) => {
-    const m = Number(month.slice(5)) - 5 + i;
+    const m = shiftMonth(month, i - 5);
     return {
       m,
-      t: ledgerTotals(
-        scopeTransactions(
-          transactions,
-          role,
-          branch,
-          `2026-${String(m).padStart(2, "0")}`,
-        ),
-      ),
+      t: ledgerTotals(scopeTransactions(transactions, role, branch, m)),
     };
   });
   const ceiling =
@@ -112,7 +124,7 @@ function Chart() {
     <section className="card">
       <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <h2 className="font-semibold">Cash flow</h2>
+          <h2 className="font-semibold">Income vs Spending</h2>
           <small className="text-[10px] text-muted">
             Income and spending over time
           </small>
@@ -138,32 +150,57 @@ function Chart() {
           <span>{money(ceiling / 2)}</span>
           <span>$0</span>
         </div>
-        <div className="flex flex-1 justify-around gap-2 border-b border-line bg-[repeating-linear-gradient(to_top,transparent_0,transparent_44px,#eef1ec_45px,#eef1ec_46px)]">
-          {series.map(({ m, t }) => (
-            <div
-              key={m}
-              className="relative flex max-w-16 flex-1 items-end justify-center gap-1 pb-6"
-            >
-              {[
-                ["Income", t.revenue],
-                ["Expenses", t.expenses],
-              ].map(([label, amount]) => (
-                <div
-                  key={label}
-                  tabIndex={0}
-                  aria-label={`${m}: ${label} ${money(amount)}`}
-                  title={`${label}: ${money(amount)}`}
-                  className={`min-h-0.5 w-[18px] rounded-t-[5px] ${label === "Income" ? "bg-brand" : "bg-[#bed2a1]"}`}
-                  style={{ height: `${(amount / ceiling) * 165}px` }}
+        <div className="min-w-0 flex-1">
+          <svg
+            viewBox="0 0 300 180"
+            className="h-[180px] w-full"
+            role="img"
+            aria-label="Monthly income and spending lines"
+          >
+            {[10, 85, 160].map((y) => (
+              <line key={y} x1="8" x2="292" y1={y} y2={y} stroke="#eef1ec" />
+            ))}
+            {[
+              ["revenue", "#216652"],
+              ["expenses", "#8aab72"],
+            ].map(([key, color]) => (
+              <g key={key}>
+                <polyline
+                  fill="none"
+                  stroke={color}
+                  strokeWidth="3"
+                  points={series
+                    .map(
+                      (s, i) =>
+                        `${10 + i * 56},${160 - (s.t[key] / ceiling) * 150}`,
+                    )
+                    .join(" ")}
                 />
-              ))}
-              <small className="absolute bottom-1 text-[10px] text-muted">
-                {new Date(2026, m - 1, 1).toLocaleDateString("en", {
+                {series.map((s, i) => (
+                  <circle
+                    key={s.m}
+                    cx={10 + i * 56}
+                    cy={160 - (s.t[key] / ceiling) * 150}
+                    r="4"
+                    fill={color}
+                  >
+                    <title>
+                      {s.m}: {key} {money(s.t[key])}
+                    </title>
+                  </circle>
+                ))}
+              </g>
+            ))}
+          </svg>
+          <div className="flex justify-between text-[10px] text-muted">
+            {series.map((s) => (
+              <span key={s.m}>
+                {new Date(s.m + "-01T12:00:00").toLocaleDateString("en", {
                   month: "short",
                 })}
-              </small>
-            </div>
-          ))}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
       <p className="mt-5 text-[10px] text-muted">
@@ -246,6 +283,26 @@ export function Dashboard() {
       </Heading>
       <Filters />
       <Stats />
+      <p className="mb-5 rounded-xl border border-line bg-white p-3 text-xs">
+        Cash flow summary - In {money(t.revenue)} / Out {money(t.expenses)} /
+        Net {money(t.profit)}
+      </p>
+      <section className="card mb-5">
+        <h2 className="mb-3 font-semibold">Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            ["capture", "Capture Receipt"],
+            ["voice", "Voice Invoice"],
+            ["ai", "Ask AI"],
+            ["transactions", "View Transactions"],
+          ].map(([target, label]) => (
+            <Button key={target} onClick={() => navigate(target)}>
+              <Icon name={target} />
+              {label}
+            </Button>
+          ))}
+        </div>
+      </section>
       <div className="grid gap-[17px]">
         <Chart />
         <section className="card">
@@ -297,43 +354,45 @@ export function Dashboard() {
           </div>
           <TransactionRows rows={sorted(rows).slice(0, 4)} />
         </section>
-        <section className="card">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-semibold">
-              {role === "owner" ? "Branch performance" : "Your branch"}
-            </h2>
-            <small className="text-muted">By revenue</small>
-          </div>
-          {list.map(({ b, t }) => (
-            <button
-              key={b}
-              className="flex w-full items-center gap-3 border-b border-line py-4 text-left last:border-0"
-              onClick={() => {
-                setBranch(b);
-                navigate("reports");
-              }}
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#f0f3eb]">
-                <Icon name="branch" className="size-[18px]" />
-              </span>
-              <span className="flex-1">
-                <b className="text-xs">{b}</b>
-                <small className="mt-1 block text-[11px] text-muted">
-                  Profit {money(t.profit)}
-                </small>
-                <span className="mt-2 block h-[5px] rounded-full bg-[#edf1e8]">
-                  <span
-                    className="block h-full rounded-full bg-[#8aab72]"
-                    style={{ width: `${(t.revenue / max) * 100}%` }}
-                  />
+        {role === "owner" && (
+          <section className="card">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-semibold">
+                {role === "owner" ? "Branch performance" : "Your branch"}
+              </h2>
+              <small className="text-muted">By revenue</small>
+            </div>
+            {list.map(({ b, t }) => (
+              <button
+                key={b}
+                className="flex w-full items-center gap-3 border-b border-line py-4 text-left last:border-0"
+                onClick={() => {
+                  setBranch(b);
+                  navigate("reports");
+                }}
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#f0f3eb]">
+                  <Icon name="branch" className="size-[18px]" />
                 </span>
-              </span>
-              <span className="text-xs font-semibold">
-                {money(t.revenue)} →
-              </span>
-            </button>
-          ))}
-        </section>
+                <span className="flex-1">
+                  <b className="text-xs">{b}</b>
+                  <small className="mt-1 block text-[11px] text-muted">
+                    Expenses {money(t.expenses)} / Profit {money(t.profit)}
+                  </small>
+                  <span className="mt-2 block h-[5px] rounded-full bg-[#edf1e8]">
+                    <span
+                      className="block h-full rounded-full bg-[#8aab72]"
+                      style={{ width: `${(t.revenue / max) * 100}%` }}
+                    />
+                  </span>
+                </span>
+                <span className="text-xs font-semibold">
+                  Revenue {money(t.revenue)}
+                </span>
+              </button>
+            ))}
+          </section>
+        )}
       </div>
       <footer className="mt-6 flex justify-between gap-3 text-[10px] text-muted">
         <span>LedgerVision · Your business, in focus</span>
@@ -527,9 +586,17 @@ export function TransactionModal() {
       id: form.id || Math.max(0, ...transactions.map((t) => t.id)) + 1,
       name: form.name.trim(),
       amount: Number(form.amount),
+      ...(form.receipt
+        ? { originalAmount: Number(form.amount) * (form.exchangeRate || 1) }
+        : {}),
       branch: role === "manager" ? "BKK" : form.branch,
     };
-    delete record.receipt;
+    if (
+      role === "manager" &&
+      editor.id &&
+      transactions.find((t) => t.id === editor.id)?.branch !== "BKK"
+    )
+      return;
     const saved = saveTransactions(
       editor.id
         ? transactions.map((t) => (t.id === editor.id ? record : t))
@@ -565,6 +632,7 @@ export function TransactionModal() {
             <Button
               primary
               onClick={() => {
+                if (role === "manager" && editor.branch !== "BKK") return;
                 saveTransactions(
                   transactions.filter((t) => t.id !== editor.id),
                 );
@@ -585,6 +653,12 @@ export function TransactionModal() {
               aria-label="Your uploaded receipt"
               style={{ backgroundImage: `url("${form.receipt}")` }}
             />
+          )}
+          {form.receipt && (
+            <p className="text-xs text-muted">
+              {form.status} / Created by {form.createdBy} / Original currency:{" "}
+              {form.currency} / AI confidence: {form.confidence}%
+            </p>
           )}
           <Field
             label="Merchant or description"
@@ -616,8 +690,8 @@ export function TransactionModal() {
           <Field
             label="Date"
             type="date"
-            min="2026-04-01"
-            max="2026-09-30"
+            min="2026-01-01"
+            max="2026-12-31"
             required
             value={form.date}
             onChange={(e) => change("date", e.target.value)}
@@ -672,78 +746,7 @@ export function TransactionModal() {
     </Modal>
   );
 }
-export function Capture() {
-  const { setEditor, notify } = useLedger();
-  function upload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (
-      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
-      file.size > 5 * 1024 * 1024
-    ) {
-      notify("Choose a JPG, PNG or WebP image under 5 MB.");
-      e.target.value = "";
-      return;
-    }
-    setEditor({
-      receipt: URL.createObjectURL(file),
-      note: "Entered from receipt: " + file.name,
-    });
-    e.target.value = "";
-  }
-  return (
-    <>
-      <Heading
-        title="From receipt to record."
-        subtitle="Keep the paperwork. Lose the busywork."
-      />
-      <section className="card">
-        <div className="mb-3 text-[10px] tracking-widest text-brand uppercase">
-          Receipt capture · simulated extraction
-        </div>
-        <h2 className="font-semibold">Add an expense in a few steps</h2>
-        <p className="my-4 muted-copy">
-          Upload an image for preview, then enter its details. Or use our sample
-          receipt to try the complete demo.
-        </p>
-        <div className="rounded-xl border-2 border-dashed border-[#cdd9c3] bg-[#f8faf4] px-4 py-9 text-center">
-          <Icon name="capture" className="mx-auto size-9 text-brand" />
-          <h2 className="mt-3 font-semibold">Your next receipt starts here</h2>
-          <p className="my-4 text-xs text-muted">
-            JPG, PNG or WebP · up to 5 MB
-          </p>
-          <input
-            className="max-w-full text-xs file:mr-2 file:rounded-lg file:border file:border-line file:bg-white file:p-2"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            aria-label="Upload receipt image"
-            onChange={upload}
-          />
-        </div>
-        <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <Button onClick={() => setEditor({})}>Enter manually</Button>
-          <Button
-            primary
-            onClick={() =>
-              setEditor({
-                name: "Angkor Market",
-                amount: 125,
-                category: "Ingredients",
-                note: "Simulated receipt extraction · Sample receipt",
-              })
-            }
-          >
-            Try sample receipt →
-          </Button>
-        </div>
-        <p className="mt-4 text-[11px] leading-6 text-muted">
-          Demo only: no OCR service or upload. Your image stays in this browser
-          session.
-        </p>
-      </section>
-    </>
-  );
-}
+export { default as Capture } from "./receipt-capture";
 export function Assistant() {
   const { rows, role, branch, month } = useLedger();
   const [messages, setMessages] = useState([]);

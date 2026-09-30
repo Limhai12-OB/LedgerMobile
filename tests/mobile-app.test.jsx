@@ -136,8 +136,10 @@ it("preserves receipt capture, filtered transactions, reports, and scoped AI", a
   await user.click(
     screen.getByRole("button", { name: "Try sample receipt →" }),
   );
-  expect(screen.getByLabelText("Amount (USD)")).toHaveValue(125);
+  expect(await screen.findByLabelText("Amount (USD)")).toHaveValue(125);
   await user.click(screen.getByRole("button", { name: "Save transaction" }));
+  await user.click(screen.getByRole("button", { name: "View Transaction" }));
+  await user.click(screen.getByRole("button", { name: "Close", exact: true }));
   await user.type(screen.getByRole("searchbox"), "Angkor");
   expect(
     screen.getByText("2 transactions · Tap an entry to review or edit"),
@@ -145,7 +147,9 @@ it("preserves receipt capture, filtered transactions, reports, and scoped AI", a
   await user.click(nav.getByRole("button", { name: "More" }));
   await user.selectOptions(screen.getByLabelText("Preview role"), "manager");
   await user.click(screen.getByRole("button", { name: "Open reports" }));
-  expect(screen.getByRole("combobox", { name: "Branch" })).toBeDisabled();
+  expect(
+    screen.queryByRole("combobox", { name: "Branch" }),
+  ).not.toBeInTheDocument();
   expect(screen.getByText("$5,225.00")).toBeInTheDocument();
   await user.click(nav.getByRole("button", { name: "AI", exact: true }));
   await user.click(screen.getByRole("button", { name: "Compare my branches" }));
